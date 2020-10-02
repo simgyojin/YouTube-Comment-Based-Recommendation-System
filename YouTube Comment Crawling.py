@@ -117,7 +117,7 @@ def get_comments(url_list, work):
     
     #dataframe으로 만들어서 csv파일로 저장
     comment_dataframe = pd.DataFrame(videos_dic)
-    comment_dataframe.to_csv('여수언니_test_result.csv', encoding='utf-8')
+    comment_dataframe.to_csv('test_result.csv', encoding='utf-8')
     driver.close()
     return videos_dic
         
