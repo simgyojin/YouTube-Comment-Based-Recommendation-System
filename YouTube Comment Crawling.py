@@ -91,6 +91,7 @@ def get_comments(url_list, work):
         page = driver.page_source
         soup = BeautifulSoup(page, "html.parser")
         title = soup.find('yt-formatted-string',{'class': 'style-scope ytd-video-primary-info-renderer'}).text
+        print('{}하는중'.format(title))
         comments = soup.find_all('yt-formatted-string',{'id':'content-text'})
         one_video_dic={}
         for comment in range(1,len(comments)+1):
@@ -100,14 +101,11 @@ def get_comments(url_list, work):
             #re 정규식을 이용하여 온전한 한국어만 크롤링
             one_video_dic[nickname]=[' '.join(korean.findall(n_comment)),like]
         videos_dic[' '.join(korean.findall(title))]=one_video_dic
+    
+    #dataframe으로 만들어서 csv파일로 저장
+    comment_dataframe = pd.DataFrame(videos_dic)
+    comment_dataframe.to_csv('여수언니_test_result.csv', encoding='utf-8')
     return videos_dic
         
-        
-#url_list=get_URL('channel/UCmRiRqCH-QMlHIX90t9v6Yw', 'want')
-videos_dic=get_comments(['/watch?v=STNlCT9bVrE'], 'want')
-dd =  pd.DataFrame(videos_dic)
-
-
-
-
-
+url_list=get_URL('user/hyeyounga', 'not want')
+videos_dic=get_comments(url_list, 'not want')
