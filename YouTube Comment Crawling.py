@@ -107,7 +107,7 @@ def get_comments(url_list, work):
             like = driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/ytd-comment-action-buttons-renderer/div[1]/span[2]'.format(comment)).text
             try:
                 #좋아요가 1개 이상인 댓글만 저장
-                if int(like) >= 1:
+                #if int(like) >= 1:
                     nickname=driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/div[1]/div[2]/a/span'.format(comment)).text
                     n_comment=driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/ytd-expander/div/yt-formatted-string[2]'.format(comment)).text
                     one_video_dic[nickname]=[n_comment,like]
@@ -117,7 +117,7 @@ def get_comments(url_list, work):
     
     #dataframe으로 만들어서 csv파일로 저장
     comment_dataframe = pd.DataFrame(videos_dic)
-    comment_dataframe.to_csv('test_result.csv', encoding='utf-8')
+    comment_dataframe.to_csv('test_files/test_result_2.csv', encoding='utf-8')
     driver.close()
     return videos_dic
         
