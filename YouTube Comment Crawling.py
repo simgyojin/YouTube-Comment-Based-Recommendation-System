@@ -31,7 +31,7 @@ def get_URL(creater, work):
     if work == 'want':
         driver = webdriver.Chrome(os.path.join(dirr, 'chromedriver.exe'))
     elif work == "not want":
-        driver = webdriver.Chrome(os.path.join(dirr, 'chromedriver.exe',chrome_options=options))
+        driver = webdriver.Chrome(os.path.join(dirr, 'chromedriver.exe'),chrome_options=options)
     
     #크롤링할 유튜버의 계정
     videos_url = 'https://www.youtube.com/{}/videos'.format(creater)
@@ -44,7 +44,7 @@ def get_URL(creater, work):
     last_page_height = driver.execute_script("return document.documentElement.scrollHeight")
     while True:
         driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
-        time.sleep(2.0) 
+        time.sleep(1.5) 
         new_page_height = driver.execute_script("return document.documentElement.scrollHeight")
         if new_page_height == last_page_height: 
             break
@@ -67,7 +67,7 @@ def get_comments(url_list, work):
     if work == 'want':
         driver = webdriver.Chrome(os.path.join(dirr, 'chromedriver.exe'))
     elif work == "not want":
-        driver = webdriver.Chrome(os.path.join(dirr, 'chromedriver.exe',chrome_options=options))
+        driver = webdriver.Chrome(os.path.join(dirr, 'chromedriver.exe'),chrome_options=options)
     
     global videos_dic
     videos_dic={}
@@ -81,7 +81,7 @@ def get_comments(url_list, work):
         #스크롤 맨 밑까지 내리기
         while True:
             driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
-            time.sleep(2.0) 
+            time.sleep(1.0) 
             new_page_height = driver.execute_script("return document.documentElement.scrollHeight")
             if new_page_height == last_page_height: 
                 break
@@ -107,5 +107,5 @@ def get_comments(url_list, work):
     comment_dataframe.to_csv('여수언니_test_result.csv', encoding='utf-8')
     return videos_dic
         
-url_list=get_URL('user/hyeyounga', 'not want')
+url_list=get_URL('user/hyeyounga', 'want')
 videos_dic=get_comments(url_list, 'not want')
