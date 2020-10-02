@@ -23,7 +23,7 @@ options.add_argument("headless")
 options.add_argument('window-size=1920x1080')
 options.add_argument('__log-level=3')
 dirr = os.path.dirname(__file__)
-korean = re.compile('[가-힣]+')
+korean = re.compile('[가-힣]')
 
 
 ###유투버 동영상 URL크롤링
@@ -44,7 +44,7 @@ def get_URL(creater, work):
     last_page_height = driver.execute_script("return document.documentElement.scrollHeight")
     while True:
         driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
-        time.sleep(1.5) 
+        time.sleep(2.0) 
         new_page_height = driver.execute_script("return document.documentElement.scrollHeight")
         if new_page_height == last_page_height: 
             break
@@ -59,6 +59,7 @@ def get_URL(creater, work):
             video_url_list.append(link['href'])
         except:
             continue
+    driver.close()
     return video_url_list
 
 
@@ -69,19 +70,26 @@ def get_comments(url_list, work):
     elif work == "not want":
         driver = webdriver.Chrome(os.path.join(dirr, 'chromedriver.exe'),chrome_options=options)
     
-    global videos_dic
     videos_dic={}
     
     #url_list의 하나하나의 url에 들어감
     for video in url_list:
         video_url = 'https://www.youtube.com{}'.format(video)
-        driver.get(video_url)
+        driver.get(video_url) 
+        
+        #댓글 창 로딩
+        driver.execute_script("window.scrollTo(0, 400);")
+        time.sleep(3.0)
+        driver.execute_script("window.scrollTo(0, 500);")
+        time.sleep(3.0)
+        
+        #page 높이        
         last_page_height = driver.execute_script("return document.documentElement.scrollHeight")
         
         #스크롤 맨 밑까지 내리기
         while True:
             driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
-            time.sleep(1.0) 
+            time.sleep(3.0) 
             new_page_height = driver.execute_script("return document.documentElement.scrollHeight")
             if new_page_height == last_page_height: 
                 break
@@ -94,18 +102,25 @@ def get_comments(url_list, work):
         print('{}하는중'.format(title))
         comments = soup.find_all('yt-formatted-string',{'id':'content-text'})
         one_video_dic={}
+        print(len(comments))
         for comment in range(1,len(comments)+1):
-            nickname=driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/div[1]/div[2]/a/span'.format(comment)).text
             like = driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/ytd-comment-action-buttons-renderer/div[1]/span[2]'.format(comment)).text
-            n_comment=driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/ytd-expander/div/yt-formatted-string[2]'.format(comment)).text
-            #re 정규식을 이용하여 온전한 한국어만 크롤링
-            one_video_dic[nickname]=[' '.join(korean.findall(n_comment)),like]
-        videos_dic[' '.join(korean.findall(title))]=one_video_dic
+            try:
+                #좋아요가 1개 이상인 댓글만 저장
+                if int(like) >= 1:
+                    nickname=driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/div[1]/div[2]/a/span'.format(comment)).text
+                    n_comment=driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/ytd-expander/div/yt-formatted-string[2]'.format(comment)).text
+                    one_video_dic[nickname]=[n_comment,like]
+            except:
+                continue
+        videos_dic[title]=one_video_dic
     
     #dataframe으로 만들어서 csv파일로 저장
     comment_dataframe = pd.DataFrame(videos_dic)
     comment_dataframe.to_csv('여수언니_test_result.csv', encoding='utf-8')
+    driver.close()
     return videos_dic
         
-url_list=get_URL('user/hyeyounga', 'want')
-videos_dic=get_comments(url_list, 'not want')
+#url_list=get_URL('user/hyeyounga', 'want')
+url_list=['/watch?v=9ndLQgIfV7A']
+videos_dic=get_comments(url_list[:1], 'want')
