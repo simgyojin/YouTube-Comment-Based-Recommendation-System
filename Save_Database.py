@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 user_id = 'root'
-user_pass = 'endeoddl2*'
+user_pass = '****'
 host = '127.0.0.1'
 database = 'youtube_comments'
 
