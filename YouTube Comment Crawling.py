@@ -31,7 +31,7 @@ dirr = os.path.dirname(__file__)
 uu_db = upload_db()
 
 #re 정규식
-korean = re.compile('[가-힣]')
+korean = re.compile('[가-힣]+')
 
 
 ###유투버 동영상 URL크롤링
@@ -123,7 +123,7 @@ def get_comments(url_list, work):
         video_name = title
         youtube_name = driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/div[6]/div[3]/ytd-video-secondary-info-renderer/div/div[2]/ytd-video-owner-renderer/div[1]/ytd-channel-name/div/div/yt-formatted-string/a').text
         view_number = driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/div[5]/div[2]/ytd-video-primary-info-renderer/div/div/div[1]/div[1]/yt-view-count-renderer/span[1]').text
-        view_num=re.findall("\d+",view_number)[0]
+        view_num=''.join(re.findall("\d+",view_number))
         update_date = driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/div[5]/div[2]/ytd-video-primary-info-renderer/div/div/div[1]/div[2]/yt-formatted-string').text.replace(' ','')
         
         #database에 video정보 입력
@@ -144,14 +144,17 @@ def get_comments(url_list, work):
                     #comment 정보 
                     nickname=driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/div[1]/div[2]/a/span'.format(comment)).text
                     n_comment=driver.find_element(By.XPATH,'/html/body/ytd-app/div/ytd-page-manager/ytd-watch-flexy/div[4]/div[1]/div/ytd-comments/ytd-item-section-renderer/div[3]/ytd-comment-thread-renderer[{}]/ytd-comment-renderer/div[1]/div[2]/ytd-expander/div/yt-formatted-string[2]'.format(comment)).text
-                    comments_dic[comment]=[nickname, like, n_comment, video_name]
+                    contents = ' '.join(korean.findall(n_comment))
+                    if len(contents) >=500:
+                        contents = contents[:499]
+                    comments_dic[comment]=[nickname, like, contents, video_name]
             except:
                 continue
             
         #database에 comment정보 입력
         comments_dataframe=pd.DataFrame(comments_dic).T
         comments_dataframe.columns=['commneter_nickname', 'like_num', 'comment_content', 'video_name']
-        print(comments_dataframe)
+        print(comments_dataframe.head())
         uu_db.upload_database(comments_dataframe,'comments')
     
         #commnets_no 1부터 정렬
