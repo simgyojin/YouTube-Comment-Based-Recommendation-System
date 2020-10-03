@@ -76,12 +76,13 @@ def get_comments(file_name, url_list, work):
     for video in url_list:
         video_url = 'https://www.youtube.com{}'.format(video)
         driver.get(video_url) 
+        time.sleep(6.0)
         
         #댓글 창 로딩
         driver.execute_script("window.scrollTo(0, 400);")
-        time.sleep(3.0)
+        time.sleep(6.0)
         driver.execute_script("window.scrollTo(0, 500);")
-        time.sleep(3.0)
+        time.sleep(6.0)
         
         #page 높이        
         last_page_height = driver.execute_script("return document.documentElement.scrollHeight")
@@ -89,7 +90,7 @@ def get_comments(file_name, url_list, work):
         #스크롤 맨 밑까지 내리기
         while True:
             driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
-            time.sleep(3.0) 
+            time.sleep(4.0) 
             new_page_height = driver.execute_script("return document.documentElement.scrollHeight")
             if new_page_height == last_page_height: 
                 break
@@ -117,10 +118,9 @@ def get_comments(file_name, url_list, work):
     
     #dataframe으로 만들어서 csv파일로 저장
     comment_dataframe = pd.DataFrame(videos_dic)
-    comment_dataframe.to_csv('test_files/{}_test_result.csv'.format(file_name), encoding='utf-8')
+    comment_dataframe.to_csv('result/{}_result.csv'.format(file_name), encoding='utf-8')
     driver.close()
     return videos_dic
         
-#url_list=get_URL('user/hyeyounga', 'want')
-url_list=['/watch?v=yUTt8F-BxPA&t=250s']
-videos_dic=get_comments('살빼조DietJo',url_list[:1], 'want')
+url_list=get_URL('user/hyeyounga', 'want')
+videos_dic=get_comments('여수언니 정혜영',url_list, 'want')
