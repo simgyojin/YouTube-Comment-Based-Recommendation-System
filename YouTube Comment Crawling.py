@@ -158,7 +158,7 @@ def get_comments(url_list, work):
         uu_db.upload_database(comments_dataframe,'comments')
     
         #commnets_no 1부터 정렬
-        cpnn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='endeoddl2*', db='youtube_comments')
+        cpnn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='****', db='youtube_comments')
         curs = cpnn.cursor()
         curs.execute('SET @COUNT = 0;')
         curs.execute('ALTER TABLE comments AUTO_INCREMENT = 1;')
